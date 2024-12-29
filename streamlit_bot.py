@@ -1,5 +1,5 @@
 import streamlit as st
-from chatbot.chatbot import chat_bot
+from chatbot import chat_bot
 import os
 import csv
 import datetime
