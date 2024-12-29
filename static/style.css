@@ -17,7 +17,8 @@
 }
 
 .ai-bubble {
-    background: rgb(240, 242, 246);
+     background: orangered;
+     color: white;
     border-radius: 10px;
 }
 
