@@ -1,11 +1,12 @@
-import streamlit as st
-from chatbot import chat_bot
 import os
 import csv
 import datetime
 from typing import Literal, TypeAlias
 from dataclasses import dataclass
+from sklearn.metrics import accuracy_score, classification_report
 import streamlit.components.v1 as components
+import streamlit as st
+from chatbot import chat_bot, X_test,y_test,clf
 
 @dataclass
 class Message:
@@ -36,18 +37,33 @@ load_css()
 
 
     # creating side bar
-menue=["Home","About"]
+menue=["🏠Home","🕓Chat History","📊Model Evaluation","📝About"]
 choice =st.sidebar.selectbox("Menue",menue)
+
+ # Initialize chat history
+  
+if os.path.exists('chat_log.csv'):
+            with open('chat_log.csv', 'r', newline='', encoding='utf-8') as csvfile:
+                csv_reader = csv.reader(csvfile)
+                next(csv_reader)
+                for row in csv_reader:
+                    st.write(f"**User**: {row[0]}\n**Chatbot**: {row[1]}\n*Time*: {row[2]}")
+
+else :
+    'chat_history' not in st.session_state
+    st.session_state['chat_history'] = []
+
 
 
 
 
  
-if choice == "Home":
+if choice == "🏠Home":
    
     
     initialize_session_state()
-    st.title("Intents based Chatbot 🤖 ")
+    st.title("GlobeGuru 🤖 ")
+    st.write(" Ask me anythink relared travel 😀 ")
 
     chat_placeholder = st.container()
     prompt_placeholder = st.form("Chat-form")
@@ -109,8 +125,32 @@ if choice == "Home":
         height=0,
         width=0,
     )
+        
+elif choice == "🕓Chat History":
+        st.subheader("📜 Conversation History")
+        st.write("Below is a record of your recent conversations with the chatbot.")
+        if st.session_state['chat_history']:
+            for chat in st.session_state['chat_history'][-5:]:
+                st.write(f"**💬 You:** {chat['user']}")
+                st.write(f"**🤖 Chatbot:** {chat['chatbot']}")
+                st.write(f"**⏱ Timestamp:** {chat['timestamp']}")
+                st.markdown("---")
+            if st.button("🗑️ Clear History"):
+                st.session_state['chat_history'] = []
+                st.success("Chat history cleared!")
+        else:
+            st.info("📂 No chat history available.")
 
-elif choice== "About":
+elif choice == "📊Model Evaluation":
+        st.subheader("📊 Model Performance Evaluation")
+        st.write("Evaluate the performance of the Intent-Based Chatbot.")
+        model_accuracy = accuracy_score(y_test, clf.predict(X_test))
+        classification_rep = classification_report(y_test, clf.predict(X_test))
+        st.write(f"📈 **Model Accuracy:** {model_accuracy * 100:.2f}%")
+        st.write("### 🛠 Classification Report")
+        st.text(classification_rep)
+
+elif choice== "📝About":
          st.write("The goal of this project to create a chatbot that can understand and resonce on give text")
          st.subheader("Project Overview:")
 
